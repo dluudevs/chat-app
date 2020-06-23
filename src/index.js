@@ -18,8 +18,21 @@ const port = process.env.PORT || 3000
 // this callback serves static files 
 app.use(express.static(publicDirectoryPath))
 
-io.on('connection', () => {
+const message = "Welcome"
+// event listener for when a client connects to socket.io
+// runs all code for existing connection
+io.on('connection', (socket) => {
   console.log('new web socket connection')
+
+  // when working with socketio and transfering data, we are sending and receiving events
+  // send event on server and receive event on client, almost all events will be custom made to fit the needs of the application
+  // emits update to a single connection
+  socket.emit('message', message)
+
+  socket.on('sendMessage', (message) => {
+    // emits event to every connection available (so all connection sees same data)
+    io.emit('message', message)
+  })
 })
 
 // starts up the server

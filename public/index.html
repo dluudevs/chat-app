@@ -7,6 +7,10 @@
 </head>
 <body>
   <h1>Chat App</h1>
+  <form id="message-form">
+    <input name="message" placeholder="Message"/>
+    <button type="submit">Send</button>
+  </form>
   <!-- this src file does not exist in directory tree, it exists because our server has been configured to work with socketio -->
   <!-- this file is the client side version of the library -->
   <script src="/socket.io/socket.io.js"></script>
