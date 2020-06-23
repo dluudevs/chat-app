@@ -1,7 +1,15 @@
 const path = require('path')
+const http = require('http')
 const express = require('express')
+const socketio = require('socket.io')
 
+// setup server to use express and socketio
 const app = express()
+// express createsServer behind the scenes but we're being explicit here as we want to use socket.io and express
+const server = http.createServer(app)
+// call socketio and pass raw http server to configure socketio to work with server. the server variable was declared for this purpose
+const io = socketio(server)
+
 const publicDirectoryPath = path.join(__dirname, '../public')
 const port = process.env.PORT || 3000
 
@@ -10,7 +18,11 @@ const port = process.env.PORT || 3000
 // this callback serves static files 
 app.use(express.static(publicDirectoryPath))
 
+io.on('connection', () => {
+  console.log('new web socket connection')
+})
+
 // starts up the server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Listening on port ${port}`)
 })
