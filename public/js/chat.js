@@ -13,10 +13,11 @@ const $messages = document.querySelector('#messages')
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationTemplate = document.querySelector('#location-message-template').innerHTML
 
-socket.on('message', (message) => {
+socket.on('message', ({ text, createdAt }) => {
   // render with template. second argument is object where the keys can be referenced in the script template
   const html = Mustache.render(messageTemplate, {
-    message
+    message: text,
+    createdAt: moment(createdAt).format('h:mm a')
   })
   $messages.insertAdjacentHTML('beforeend', html)
 })
