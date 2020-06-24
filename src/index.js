@@ -18,7 +18,6 @@ const port = process.env.PORT || 3000
 // this callback serves static files 
 app.use(express.static(publicDirectoryPath))
 
-const message = "Welcome"
 // event listener for when a client connects to socket.io
 // runs all code for existing connection
 io.on('connection', (socket) => {
@@ -27,11 +26,24 @@ io.on('connection', (socket) => {
   // when working with socketio and transfering data, we are sending and receiving events
   // send event on server and receive event on client, almost all events will be custom made to fit the needs of the application
   // emits update to a single connection
-  socket.emit('message', message)
+  socket.emit('message', "Welcome!")
+  
+  // broadcasting sends a message to every connection except the current one
+  socket.broadcast.emit('message', 'A new user has joined!')
 
   socket.on('sendMessage', (message) => {
     // emits event to every connection available (so all connection sees same data)
     io.emit('message', message)
+  })
+
+  // when socket (client) gets disconnected. not what you would expect as a connection uses io.on
+  socket.on('disconnect', () => {
+    // no need to use broadcast as the disconnected user would not receive this message
+    io.emit('message', 'A user has disconnected')
+  })
+
+  socket.on('sendLocation', ({latitude, longitude}) => {
+    io.emit('message', `https://google.com/maps?q=${latitude},${longitude}`)
   })
 })
 
