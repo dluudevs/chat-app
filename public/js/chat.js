@@ -11,11 +11,19 @@ const $messages = document.querySelector('#messages')
 
 // Templates - templates need access to the script's innerHTML property
 const messageTemplate = document.querySelector('#message-template').innerHTML
+const locationTemplate = document.querySelector('#location-message-template').innerHTML
 
 socket.on('message', (message) => {
   // render with template. second argument is object where the keys can be referenced in the script template
   const html = Mustache.render(messageTemplate, {
     message
+  })
+  $messages.insertAdjacentHTML('beforeend', html)
+})
+
+socket.on('locationMessage', (url) => {
+  const html = Mustache.render(locationTemplate, {
+    url
   })
   $messages.insertAdjacentHTML('beforeend', html)
 })
@@ -60,7 +68,6 @@ $sendLocationButton.addEventListener('click', () => {
       { latitude, longitude }, 
       () => {
         $sendLocationButton.removeAttribute('disabled')
-        console.log('Location shared!')
       })
   })
 })

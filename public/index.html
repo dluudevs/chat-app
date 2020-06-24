@@ -17,10 +17,17 @@
   <button id="send-location">Send Location</button>
 
   <!-- setup this way to work with mustache, a templating library-->
+  <!-- this creates a template that gets inserted to #messages -->
   <script id="message-template" type="text/html">
     <div>
       <!-- curly braces references one of the values passed in -->
       <p>{{message}}</p>
+    </div>
+  </script>
+
+  <script id="location-message-template" type="text/html">
+    <div>
+      <p><a href={{url}} target="_blank">My Current Location</a></p>
     </div>
   </script>
 
