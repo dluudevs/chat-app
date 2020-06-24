@@ -2,6 +2,7 @@ const path = require('path')
 const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
+const Filter = require('bad-words')
 
 // setup server to use express and socketio
 const app = express()
@@ -31,9 +32,18 @@ io.on('connection', (socket) => {
   // broadcasting sends a message to every connection except the current one
   socket.broadcast.emit('message', 'A new user has joined!')
 
-  socket.on('sendMessage', (message) => {
+  // callback is called to acknowledge the event. in client, a callback was passed to be called when event is acknowledged
+  // whoever receives the event, calls the callback
+  socket.on('sendMessage', (message, callback) => {
+    const filter = new Filter()
+    
+    if(filter.isProfane(message)){
+      return callback('Profanity is not allowed!')
+    }
     // emits event to every connection available (so all connection sees same data)
     io.emit('message', message)
+    // can pass value to callback and which becomes accessible by the client
+    callback()
   })
 
   // when socket (client) gets disconnected. not what you would expect as a connection uses io.on
@@ -42,8 +52,9 @@ io.on('connection', (socket) => {
     io.emit('message', 'A user has disconnected')
   })
 
-  socket.on('sendLocation', ({latitude, longitude}) => {
+  socket.on('sendLocation', ({latitude, longitude}, callback) => {
     io.emit('message', `https://google.com/maps?q=${latitude},${longitude}`)
+    callback()
   })
 })
 
