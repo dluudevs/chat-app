@@ -7,9 +7,17 @@ const $messageForm = document.querySelector('#message-form')
 const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $sendLocationButton = document.querySelector('#send-location')
+const $messages = document.querySelector('#messages')
+
+// Templates - templates need access to the script's innerHTML property
+const messageTemplate = document.querySelector('#message-template').innerHTML
 
 socket.on('message', (message) => {
-  console.log(message)
+  // render with template. second argument is object where the keys can be referenced in the script template
+  const html = Mustache.render(messageTemplate, {
+    message
+  })
+  $messages.insertAdjacentHTML('beforeend', html)
 })
 
 $messageForm.addEventListener('submit', (e) => {
