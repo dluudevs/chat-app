@@ -13,6 +13,10 @@ const $messages = document.querySelector('#messages')
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationTemplate = document.querySelector('#location-message-template').innerHTML
 
+// Options
+// QS parses query string. Query string is created when a user submits a display name / room (key names determined with name attribute in html)
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
+
 socket.on('message', ({ text, createdAt }) => {
   // render with template. second argument is object where the keys can be referenced in the script template
   const html = Mustache.render(messageTemplate, {
@@ -73,3 +77,5 @@ $sendLocationButton.addEventListener('click', () => {
       })
   })
 })
+
+socket.emit('join', ({username, room}))

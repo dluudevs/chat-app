@@ -28,10 +28,15 @@ io.on('connection', (socket) => {
   // when working with socketio and transfering data, we are sending and receiving events
   // send event on server and receive event on client, almost all events will be custom made to fit the needs of the application
   // emits update to a single connection
-  socket.emit('message', generateMessage('Welcome'))
-  
-  // broadcasting sends a message to every connection except the current one
-  socket.broadcast.emit('message', generateMessage('A new user has joined!'))
+  socket.on('join', ({ username, room }) => {
+    // by using join, we are able to emit events exclusively to that room via new methods
+    socket.join(room)
+
+    // sends message to socket (new connection)
+    socket.emit('message', generateMessage('Welcome'))
+    // emits event to everyone in a room except new client
+    socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`))
+  })
 
   // callback is called to acknowledge the event. in client, a callback was passed to be called when event is acknowledged
   // whoever receives the event, calls the callback
@@ -42,7 +47,7 @@ io.on('connection', (socket) => {
       return callback('Profanity is not allowed!')
     }
     // emits event to every connection available (so all connection sees same data)
-    io.emit('message', generateMessage(message))
+    io.to('Another Room').emit('message', generateMessage(message))
     // can pass value to callback and which becomes accessible by the client
     callback()
   })
