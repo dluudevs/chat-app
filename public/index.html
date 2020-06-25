@@ -4,30 +4,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat App</title>
+  <link rel="icon" href="/img/favicon.png">
+  <link rel="stylesheet" href="/css/styles.min.css">
 </head>
 <body>
-  <h1>Chat App</h1>
+  <div class="chat">
+    <div class="chat__sidebar">
 
-  <div id="messages"></div>
+    </div>
+    <div class="chat__main">
+      <div id="messages" class="chat__messages"></div>
 
-  <form id="message-form">
-    <input name="message" placeholder="Message"/>
-    <button type="submit">Send</button>
-  </form>
-  <button id="send-location">Send Location</button>
+      <div class="compose">
+        <form id="message-form">
+          <input name="message" placeholder="Message"/>
+          <button type="submit">Send</button>
+        </form>
+        <button id="send-location">Send Location</button>
+      </div>
 
+    </div>
+  </div>
   <!-- setup this way to work with mustache, a templating library-->
   <!-- this creates a template that gets inserted to #messages -->
   <script id="message-template" type="text/html">
-    <div>
+    <div class="message">
       <!-- curly braces references one of the values passed in -->
-      <p>{{createdAt}} - {{message}}</p>
+      <p>
+        <span class="message__name">User</span>
+        <span class="message__meta">{{createdAt}}</span>
+      </p>
+      <p>{{message}}</p>
     </div>
   </script>
 
   <script id="location-message-template" type="text/html">
-    <div>
-      <p>{{createdAt}} - <a href={{url}} target="_blank">My Current Location</a></p>
+    <div class="message">
+      <p>
+        <span class="message__name">User</span>
+        <span class="message__meta">{{createdAt}}</span>
+      </p>
+      <p><a href={{url}} target="_blank">My Current Location</a></p>
     </div>
   </script>
 
