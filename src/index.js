@@ -4,6 +4,7 @@ const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 
 // setup server to use express and socketio
 const app = express()
@@ -28,14 +29,23 @@ io.on('connection', (socket) => {
   // when working with socketio and transfering data, we are sending and receiving events
   // send event on server and receive event on client, almost all events will be custom made to fit the needs of the application
   // emits update to a single connection
-  socket.on('join', ({ username, room }) => {
+  socket.on('join', ({ username, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, username, room })
+
+    if (error){
+      // acknowlege user attempted to join and send back error
+      // use acknowledge instead of emit because the client will get the value passed to the callback and can determine what to do with it
+      return callback(error)  
+    }
+
     // by using join, we are able to emit events exclusively to that room via new methods
-    socket.join(room)
+    socket.join(user.room)
 
     // sends message to socket (new connection)
     socket.emit('message', generateMessage('Welcome'))
     // emits event to everyone in a room except new client
-    socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined!`))
+    socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))
+    callback()
   })
 
   // callback is called to acknowledge the event. in client, a callback was passed to be called when event is acknowledged
@@ -54,8 +64,13 @@ io.on('connection', (socket) => {
 
   // when socket (client) gets disconnected. not what you would expect as a connection uses io.on
   socket.on('disconnect', () => {
-    // no need to use broadcast as the disconnected user would not receive this message
-    io.emit('message', generateMessage('A user has disconnected'))
+
+    const user = removeUser(socket.id)
+
+    if (user) {
+      // no need to use broadcast as the disconnected user would not receive this message
+      return io.to(user.room).emit('message', generateMessage(`${user.username} has left!`))
+    }
   })
 
   socket.on('sendLocation', ({latitude, longitude}, callback) => {
