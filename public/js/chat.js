@@ -17,17 +17,20 @@ const locationTemplate = document.querySelector('#location-message-template').in
 // QS parses query string. Query string is created when a user submits a display name / room (key names determined with name attribute in html)
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
-socket.on('message', ({ text, createdAt }) => {
+socket.on('message', ({ username, text, createdAt }) => {
   // render with template. second argument is object where the keys can be referenced in the script template
   const html = Mustache.render(messageTemplate, {
+    username,
     message: text,
     createdAt: moment(createdAt).format('h:mm a')
   })
   $messages.insertAdjacentHTML('beforeend', html)
 })
 
-socket.on('locationMessage', ({ url, createdAt }) => {
+socket.on('locationMessage', ({ username, url, createdAt }) => {
+  console.log(url)
   const html = Mustache.render(locationTemplate, {
+    username,
     url,
     createdAt: moment(createdAt).format('h:mm a')
   })

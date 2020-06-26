@@ -17,7 +17,7 @@
 
       <div class="compose">
         <form id="message-form">
-          <input name="message" placeholder="Message"/>
+          <input name="message" placeholder="Message" autocomplete="off"/>
           <button type="submit">Send</button>
         </form>
         <button id="send-location">Send Location</button>
@@ -31,7 +31,7 @@
     <div class="message">
       <!-- curly braces references one of the values passed in -->
       <p>
-        <span class="message__name">User</span>
+        <span class="message__name">{{username}}</span>
         <span class="message__meta">{{createdAt}}</span>
       </p>
       <p>{{message}}</p>
@@ -41,7 +41,7 @@
   <script id="location-message-template" type="text/html">
     <div class="message">
       <p>
-        <span class="message__name">User</span>
+        <span class="message__name">{{username}}</span>
         <span class="message__meta">{{createdAt}}</span>
       </p>
       <p><a href={{url}} target="_blank">My Current Location</a></p>

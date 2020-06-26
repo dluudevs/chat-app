@@ -35,6 +35,7 @@ io.on('connection', (socket) => {
     if (error){
       // acknowlege user attempted to join and send back error
       // use acknowledge instead of emit because the client will get the value passed to the callback and can determine what to do with it
+      // not using emit because emit should only be used for specific events 
       return callback(error)  
     }
 
@@ -42,22 +43,24 @@ io.on('connection', (socket) => {
     socket.join(user.room)
 
     // sends message to socket (new connection)
-    socket.emit('message', generateMessage('Welcome'))
+    socket.emit('message', generateMessage('Admin', 'Welcome'))
     // emits event to everyone in a room except new client
-    socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))
+    socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined!`))
     callback()
   })
 
   // callback is called to acknowledge the event. in client, a callback was passed to be called when event is acknowledged
   // whoever receives the event, calls the callback
   socket.on('sendMessage', (message, callback) => {
+    const user = getUser(socket.id)
+    
     const filter = new Filter()
     
     if(filter.isProfane(message)){
       return callback('Profanity is not allowed!')
     }
     // emits event to every connection available (so all connection sees same data)
-    io.to('Another Room').emit('message', generateMessage(message))
+    io.to(user.room).emit('message', generateMessage(user.username, message))
     // can pass value to callback and which becomes accessible by the client
     callback()
   })
@@ -69,12 +72,14 @@ io.on('connection', (socket) => {
 
     if (user) {
       // no need to use broadcast as the disconnected user would not receive this message
-      return io.to(user.room).emit('message', generateMessage(`${user.username} has left!`))
+      return io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`))
     }
   })
 
   socket.on('sendLocation', ({latitude, longitude}, callback) => {
-    io.emit('locationMessage', generateLocationMessage(`https://google.com/maps?q=${latitude},${longitude}`))
+    const user = getUser(socket.id)
+
+    io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${latitude},${longitude}`))
     callback()
   })
 })
