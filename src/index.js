@@ -46,6 +46,11 @@ io.on('connection', (socket) => {
     socket.emit('message', generateMessage('Admin', 'Welcome'))
     // emits event to everyone in a room except new client
     socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined!`))
+    // emit event to everyone in the room
+    io.to(user.room).emit('roomData', {
+      room: user.room,
+      users: getUsersInRoom(user.room)
+    })
     callback()
   })
 
@@ -72,7 +77,11 @@ io.on('connection', (socket) => {
 
     if (user) {
       // no need to use broadcast as the disconnected user would not receive this message
-      return io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`))
+      io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`))
+      io.to(user.room).emit('roomData', {
+        room: user.room,
+        users: getUsersInRoom(user.room)
+      })
     }
   })
 

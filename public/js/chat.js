@@ -12,6 +12,7 @@ const $messages = document.querySelector('#messages')
 // Templates - templates need access to the script's innerHTML property
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationTemplate = document.querySelector('#location-message-template').innerHTML
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 
 // Options
 // QS parses query string. Query string is created when a user submits a display name / room (key names determined with name attribute in html)
@@ -37,6 +38,15 @@ socket.on('locationMessage', ({ username, url, createdAt }) => {
   $messages.insertAdjacentHTML('beforeend', html)
 })
 
+socket.on('roomData', ({ room, users }) => {
+  const html = Mustache.render(sidebarTemplate, {
+    room,
+    users
+  })
+
+  document.querySelector('#sidebar').innerHTML = html
+})
+
 $messageForm.addEventListener('submit', (e) => {
   e.preventDefault()
   // disable form, prevent user from sending another message when a message is being sent
@@ -57,8 +67,6 @@ $messageForm.addEventListener('submit', (e) => {
       // server only passes a value to callback when profanity is being used
       return console.log(error)
     }
-
-    console.log('Message delivered!')
   })
 }) 
 
